@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: buildit-jenkins-deployment
+  labels:
+    app: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: buildit-jenkins
+        image: combined-registry.sbx.zone/builditdigital/jenkins-image:1.0.0
+        env:
+          - name: JENKINS_CONFIG_FILE
+            valueFrom:
+              configMapKeyRef:
+                name: buildit-jenkins-configmap
+                key: JENKINS_CONFIG_FILE
+          - name: JENKINS_STARTUP_SECRET
+            valueFrom:
+             secretKeyRef:
+               name: jenkins-startup-secret
+               key: JENKINS_STARTUP_SECRET
+        ports:
+        - containerPort: 8080
