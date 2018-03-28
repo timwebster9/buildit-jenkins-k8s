@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: buildit-jenkins-ingress
+spec:
+  rules:
+  - host: buildit-jenkins.sbx.zone
+    http:
+      paths:
+      - backend: 
+          serviceName: buildit-jenkins-service
+          servicePort: 80

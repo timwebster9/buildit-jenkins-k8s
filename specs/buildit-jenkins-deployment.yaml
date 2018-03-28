@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: buildit-jenkins
-        image: combined-registry.sbx.zone/builditdigital/jenkins-image:1.0.0
+        image: combined-registry.sbx.zone/builditdigital/jenkins-image:1.0.8-alpine
         env:
           - name: JENKINS_CONFIG_FILE
             valueFrom:
