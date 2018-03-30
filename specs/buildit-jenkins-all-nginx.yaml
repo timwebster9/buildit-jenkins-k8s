@@ -51,31 +51,8 @@ spec:
         - containerPort: 8080
           name: http
 ---
-# Follow this to install nginx ingress controller: https://github.com/kubernetes/ingress-nginx/tree/master/deploy
-apiVersion: v1
-kind: Service
-metadata:
-  name: ingress-nginx
-  namespace: ingress-nginx
-spec:
-  type: NodePort
-  ports:
-  - name: http
-    # Chooses a random port on the node by default (30000-32767). Describe the service to get the chosen port.
-    # Uncomment to set explicitly - it must be in the above range.
-    #nodePort: 30000
-    port: 80
-    targetPort: 80
-    protocol: TCP
-  - name: https
-    # Chooses a random port on the node by default (30000-32767). Describe the service to get the chosen port.
-    # Uncomment to set explicitly - it must be in the above range. 
-    #nodePort: 30443
-    port: 443
-    targetPort: 443
-    protocol: TCP
-  selector:
-    app: ingress-nginx
+# Follow this to install nginx ingress controller: https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
+# I would recommend a daemon-set, which will run nginx on all nodes and expose ports 80/443 on them
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
