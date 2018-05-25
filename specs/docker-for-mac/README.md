@@ -3,6 +3,7 @@
 ## Prerequisites
 * Install and configure Docker for Mac with Kubernetes.  This is a good start: https://rominirani.com/tutorial-getting-started-with-kubernetes-with-docker-on-mac-7f58467203fd
 * Have a 'Jenkins config' repo ready.  Here is mine for reference: https://github.com/timwebster9/jenkins-config
+* update 'JENKINS_CONFIG_FILE' in buildit-jenkins-loadbalancer.yaml with your own config repo URL, if desired.
 * add a Kubernetes secret for your Bulidit Jenkins encryption key manually, with name 'jenkins-startup-secret' and key 'JENKINS_STARTUP_SECRET'
 
 ## Jenkins Deployment
