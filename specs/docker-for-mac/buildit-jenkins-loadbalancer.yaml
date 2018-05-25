@@ -60,22 +60,4 @@ spec:
           name: http
         - containerPort: 5000
           name: tcp
----
-# Follow this to install nginx ingress controller: https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
-# I would recommend a daemon-set, which will run nginx on all nodes and expose ports 80/443 on them
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: buildit-jenkins-ingress
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-spec:
-  rules:
-  # Your DNS has to be able to resolve this hostname
-  - host: buildit-jenkins
-    http:
-      paths:
-      - backend: 
-          serviceName: buildit-jenkins
-          servicePort: 80
+
