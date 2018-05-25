@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ingress-nginx
+  namespace: default
+  labels:
+    app: ingress-nginx
+spec:
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  selector:
+    app: jenkins
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: tcp
+    port: 5000
+    targetPort: 5000
