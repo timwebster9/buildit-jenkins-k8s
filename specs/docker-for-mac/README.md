@@ -18,7 +18,13 @@ The Jenkins Kubernetes plugin configuration uses internal DNS names, since Jenki
     namespace = 'default',
     jenkinsUrl = 'http://jenkins-lb.default'
 ````
+
+Cluster credentials/certificate config seems to be unnecessary.
+
 ## Load Balancer
 This configuration uses a LoadBalancer service, which will expose ports on your host.  Currently this is port 80 (Jenkins UI) and 5000 (JNLP).
 
 Note the Jenkins URL is the DNS name of the load balancer service.
+
+## Testing
+Run the 'hello-k8s' job.  It should work if everything is set up correctly.
