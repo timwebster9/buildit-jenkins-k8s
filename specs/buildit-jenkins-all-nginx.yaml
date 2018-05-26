@@ -15,9 +15,9 @@ kind: ConfigMap
 metadata:
   name: buildit-jenkins-config
 data:
-  JENKINS_CONFIG_FILE: https://github.com/buildit/jenkins-config.git
+  JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config.git
 ---
-apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: buildit-jenkins
@@ -33,7 +33,7 @@ spec:
         app: jenkins
     spec:
       containers:
-      - image: builditdigital/jenkins-image:1.0.9-alpine
+      - image: builditdigital/jenkins-image:2.2.0-alpine
         name: jenkins
         env:
         - name: JENKINS_CONFIG_FILE
