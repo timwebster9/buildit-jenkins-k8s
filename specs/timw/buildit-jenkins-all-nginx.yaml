@@ -55,7 +55,7 @@ metadata:
   name: buildit-jenkins-config
   namespace: buildit-jenkins
 data:
-  JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config.git
+  JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-home.git
 ---
 apiVersion: apps/v1
 kind: Deployment
