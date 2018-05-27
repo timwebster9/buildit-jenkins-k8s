@@ -94,6 +94,43 @@ spec:
         - containerPort: 8080
           name: http
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: buildit-encryptor
+  namespace: buildit-jenkins
+spec:
+  ports:
+  - name: ui
+    protocol: TCP
+    port: 80
+    targetPort: 4567
+  selector:
+    app: encryptor
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildit-encryptor
+  namespace: buildit-jenkins
+spec:
+  selector:
+    matchLabels:
+      app: encryptor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: encryptor
+    spec:
+      containers:
+      - image: builditdigital/encryptor-api:2.4.0
+        name: encryptor
+        ports:
+        - containerPort: 4567
+          name: http
+---
 # Follow this to install nginx ingress controller: https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
 # For bare-metal I would recommend a daemon-set, which will run nginx on all nodes and expose ports 80/443 on them
 # For cloud you can use a service of type 'LoadBalancer'
@@ -113,4 +150,10 @@ spec:
       paths:
       - backend: 
           serviceName: buildit-jenkins
+          servicePort: 80
+  - host: buildit-encryptor.portworx.zone
+    http:
+      paths:
+      - backend: 
+          serviceName: buildit-encryptor
           servicePort: 80
