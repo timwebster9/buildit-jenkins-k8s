@@ -18,12 +18,30 @@ spec:
     port: 5000
     targetPort: 5000
 ---
+kind: Service
+apiVersion: v1
+metadata:
+  name: encryptor-lb
+  namespace: default
+  labels:
+    app: encryptor-lb
+spec:
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  selector:
+    app: encryptor
+  ports:
+  - name: http
+    port: 8070
+    targetPort: 4567
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: buildit-jenkins-config
 data:
   JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config.git
+  JAVA_OPTS: -Djenkins.install.runSetupWizard=false
 ---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -41,7 +59,7 @@ spec:
         app: jenkins
     spec:
       containers:
-      - image: builditdigital/jenkins-image:2.2.0-alpine
+      - image: builditdigital/jenkins-image:2.3.0-alpine
         name: jenkins
         env:
         - name: JENKINS_CONFIG_FILE
@@ -49,6 +67,11 @@ spec:
             configMapKeyRef:
               name: buildit-jenkins-config
               key: JENKINS_CONFIG_FILE
+        - name: JAVA_OPTS
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JAVA_OPTS
         # Secret created manually: https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets
         - name: JENKINS_STARTUP_SECRET
           valueFrom:
@@ -60,4 +83,26 @@ spec:
           name: http
         - containerPort: 5000
           name: tcp
-
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildit-encryptor
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: encryptor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: encryptor
+    spec:
+      containers:
+      - image: builditdigital/encryptor-api:2.4.0
+        name: encryptor
+        ports:
+        - containerPort: 4567
+          name: http
