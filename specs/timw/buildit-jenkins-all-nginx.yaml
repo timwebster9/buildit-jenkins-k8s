@@ -56,6 +56,7 @@ metadata:
   namespace: buildit-jenkins
 data:
   JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-home.git
+  JAVA_OPTS: -Djenkins.install.runSetupWizard=false
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -74,7 +75,7 @@ spec:
         app: jenkins
     spec:
       containers:
-      - image: builditdigital/jenkins-image:2.2.0-alpine
+      - image: builditdigital/jenkins-image:2.6.0-alpine
         name: jenkins
         env:
         - name: JENKINS_CONFIG_FILE
@@ -82,6 +83,11 @@ spec:
             configMapKeyRef:
               name: buildit-jenkins-config
               key: JENKINS_CONFIG_FILE
+        - name: JAVA_OPTS
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JAVA_OPTS
         # Need to create namespace first
         # Secret created manually: https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets
         # e.g. kubectl create secret generic jenkins-startup-secret --from-literal=JENKINS_STARTUP_SECRET=<secret> -n buildit-jenkins
