@@ -56,7 +56,11 @@ metadata:
   namespace: buildit-jenkins
 data:
   JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-home.git
-  JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+  JAVA_OPTS: >
+    -Djenkins.install.runSetupWizard=false
+    -Dhudson.slaves.NodeProvisioner.initialDelay=0
+    -Dhudson.slaves.NodeProvisioner.MARGIN=50
+    -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -138,7 +142,7 @@ spec:
           name: http
 ---
 # Follow this to install nginx ingress controller: https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
-# For bare-metal I would recommend a daemon-set, which will run nginx on all nodes and expose ports 80/443 on them
+# For bare-metal I would recommend a daemon-set, which will run nginx on all nodes and expose ports 80/443 on them (or use nginx-ingress-daemonset.yaml)
 # For cloud you can use a service of type 'LoadBalancer'
 ---
 apiVersion: extensions/v1beta1
@@ -157,9 +161,16 @@ spec:
       - backend: 
           serviceName: buildit-jenkins
           servicePort: 80
+  - host: jenkins.deggymacets.com
+    http:
+      paths:
+      - backend: 
+          serviceName: buildit-jenkins
+          servicePort: 80
   - host: buildit-encryptor.portworx.zone
     http:
       paths:
       - backend: 
           serviceName: buildit-encryptor
           servicePort: 80
+
