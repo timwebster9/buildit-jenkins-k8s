@@ -41,7 +41,11 @@ metadata:
   name: buildit-jenkins-config
 data:
   JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config.git
-  JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+  JAVA_OPTS: >
+    -Djenkins.install.runSetupWizard=false
+    -Dhudson.slaves.NodeProvisioner.initialDelay=0
+    -Dhudson.slaves.NodeProvisioner.MARGIN=50
+    -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
 ---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
