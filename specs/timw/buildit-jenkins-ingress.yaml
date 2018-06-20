@@ -1,0 +1,33 @@
+---
+# Follow this to install nginx ingress controller: https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
+# For bare-metal I would recommend a daemon-set, which will run nginx on all nodes and expose ports 80/443 on them (or use nginx-ingress-daemonset.yaml)
+# For cloud you can use a service of type 'LoadBalancer'
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: buildit-jenkins-ingress
+  namespace: buildit-jenkins
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  # Your DNS has to be able to resolve this hostname
+  - host: buildit-jenkins.portworx.zone
+    http:
+      paths:
+      - backend: 
+          serviceName: buildit-jenkins
+          servicePort: 80
+  - host: jenkins.deggymacets.com
+    http:
+      paths:
+      - backend: 
+          serviceName: buildit-jenkins
+          servicePort: 80
+  - host: buildit-encryptor.portworx.zone
+    http:
+      paths:
+      - backend: 
+          serviceName: buildit-encryptor
+          servicePort: 80
