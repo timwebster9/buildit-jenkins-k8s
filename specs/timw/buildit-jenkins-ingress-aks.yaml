@@ -1,7 +1,4 @@
----
-# Follow this to install nginx ingress controller: https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
-# For bare-metal I would recommend a daemon-set, which will run nginx on all nodes and expose ports 80/443 on them (or use nginx-ingress-daemonset.yaml)
-# For cloud you can use a service of type 'LoadBalancer'
+# https://docs.microsoft.com/en-us/azure/aks/http-application-routing
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
