@@ -1,3 +1,8 @@
+# Need to create namespace first
+#
+# Secret created manually: https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets
+# e.g. kubectl create secret generic jenkins-startup-secret --from-literal=JENKINS_STARTUP_SECRET=<secret> -n buildit-jenkins
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -23,6 +28,7 @@ metadata:
   namespace: buildit-jenkins
 data:
   JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-home.git
+  JENKINS_STARTUP_SECRET_FILE: /var/run/jenkins/startup-secret/JENKINS_STARTUP_SECRET
   JAVA_OPTS: >
     -Djenkins.install.runSetupWizard=false
     -Dhudson.slaves.NodeProvisioner.initialDelay=0
@@ -48,7 +54,19 @@ spec:
       containers:
       - image: builditdigital/jenkins-image:2.6.0-alpine
         name: jenkins
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: startup-secret
+          mountPath: "/var/run/jenkins/startup-secret"
+          readOnly: true
         env:
+        - name: JENKINS_STARTUP_SECRET_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JENKINS_STARTUP_SECRET_FILE
         - name: JENKINS_CONFIG_FILE
           valueFrom:
             configMapKeyRef:
@@ -59,17 +77,10 @@ spec:
             configMapKeyRef:
               name: buildit-jenkins-config
               key: JAVA_OPTS
-        # Need to create namespace first
-        # Secret created manually: https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets
-        # e.g. kubectl create secret generic jenkins-startup-secret --from-literal=JENKINS_STARTUP_SECRET=<secret> -n buildit-jenkins
-        - name: JENKINS_STARTUP_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: jenkins-startup-secret
-              key: JENKINS_STARTUP_SECRET
-        ports:
-        - containerPort: 8080
-          name: http
+      volumes:
+      - name: startup-secret
+        secret:
+          secretName: jenkins-startup-secret
 ---
 apiVersion: v1
 kind: Service
