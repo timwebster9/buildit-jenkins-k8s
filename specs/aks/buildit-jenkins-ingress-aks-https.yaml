@@ -1,0 +1,29 @@
+# https://docs.microsoft.com/en-us/azure/aks/ingress
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: buildit-jenkins-ingress
+  namespace: buildit-jenkins
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - timw-aks-ingress.eastus.cloudapp.azure.com
+    secretName: tls-secret
+  rules:
+  # Your DNS has to be able to resolve this hostname
+  - host: timw-aks-ingress.uksouth.cloudapp.azure.com
+    http:
+      paths:
+      - path: /
+        backend: 
+          serviceName: buildit-jenkins
+          servicePort: 80
+      - path: /encryptor
+        backend: 
+          serviceName: buildit-encryptor
+          servicePort: 80
+

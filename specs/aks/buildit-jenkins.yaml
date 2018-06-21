@@ -1,0 +1,122 @@
+# Need to create namespace first
+#
+# Secret created manually: https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets
+# e.g. kubectl create secret generic jenkins-startup-secret --from-literal=JENKINS_STARTUP_SECRET=<secret> -n buildit-jenkins
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: buildit-jenkins
+  namespace: buildit-jenkins
+spec:
+  ports:
+  - name: ui
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+  - name: jnlp
+    protocol: TCP
+    port: 5000
+    targetPort: 5000
+  selector:
+    app: jenkins
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildit-jenkins-config
+  namespace: buildit-jenkins
+data:
+  JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-home.git
+  JENKINS_STARTUP_SECRET_FILE: /var/run/jenkins/startup-secret/JENKINS_STARTUP_SECRET
+  JAVA_OPTS: >
+    -Djenkins.install.runSetupWizard=false
+    -Dhudson.slaves.NodeProvisioner.initialDelay=0
+    -Dhudson.slaves.NodeProvisioner.MARGIN=50
+    -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildit-jenkins
+  namespace: buildit-jenkins
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - image: builditdigital/jenkins-image:2.6.0-alpine
+        name: jenkins
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: startup-secret
+          mountPath: "/var/run/jenkins/startup-secret"
+          readOnly: true
+        env:
+        - name: JENKINS_STARTUP_SECRET_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JENKINS_STARTUP_SECRET_FILE
+        - name: JENKINS_CONFIG_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JENKINS_CONFIG_FILE
+        - name: JAVA_OPTS
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JAVA_OPTS
+      volumes:
+      - name: startup-secret
+        secret:
+          secretName: jenkins-startup-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: buildit-encryptor
+  namespace: buildit-jenkins
+spec:
+  ports:
+  - name: ui
+    protocol: TCP
+    port: 80
+    targetPort: 4567
+  selector:
+    app: encryptor
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildit-encryptor
+  namespace: buildit-jenkins
+spec:
+  selector:
+    matchLabels:
+      app: encryptor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: encryptor
+    spec:
+      containers:
+      - image: builditdigital/encryptor-api:2.4.0
+        name: encryptor
+        ports:
+        - containerPort: 4567
+          name: http
+
+
