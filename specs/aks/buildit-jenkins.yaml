@@ -27,7 +27,7 @@ metadata:
   name: buildit-jenkins-config
   namespace: buildit-jenkins
 data:
-  JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-home.git
+  JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-aks.git
   JENKINS_STARTUP_SECRET_FILE: /var/run/jenkins/startup-secret/JENKINS_STARTUP_SECRET
   JAVA_OPTS: >
     -Djenkins.install.runSetupWizard=false
