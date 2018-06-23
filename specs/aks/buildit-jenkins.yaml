@@ -1,7 +1,37 @@
-# Need to create namespace first
-#
 # Secret created manually: https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets
 # e.g. kubectl create secret generic jenkins-startup-secret --from-literal=JENKINS_STARTUP_SECRET=<secret> -n buildit-jenkins
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: buildit-jenkins
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: buildit-jenkins
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["extensions"]
+  resources: ["deployments", "replicasets", "ingresses"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods", "pods/exec", "pods/log", "services"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: buildit-jenkins
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: buildit-jenkins
+roleRef:
+  kind: ClusterRole
+  name: buildit-jenkins 
+  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
 kind: Service

@@ -11,11 +11,11 @@ metadata:
 spec:
   tls:
   - hosts:
-    - timw-aks-ingress.uksouth.cloudapp.azure.com
+    - timw-aks.uksouth.cloudapp.azure.com
     secretName: tls-secret
   rules:
   # Your DNS has to be able to resolve this hostname
-  - host: timw-aks-ingress.uksouth.cloudapp.azure.com
+  - host: timw-aks.uksouth.cloudapp.azure.com
     http:
       paths:
       - path: /

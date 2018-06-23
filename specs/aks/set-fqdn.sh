@@ -3,6 +3,9 @@
 # Sets public DNS name for ingress controller
 # https://docs.microsoft.com/en-us/azure/aks/ingress
 
+# Get IP address of Ingress from:
+# kubectl get service -l app=nginx-ingress --namespace kube-system
+
 if [ "$#" -ne 2 ]; then
     echo "Usage: ./set-fqdn.sh <IP ADDRESS> <DNS PREFIX>"
 fi
