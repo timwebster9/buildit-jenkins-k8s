@@ -19,3 +19,10 @@ az aks create --resource-group $RG_NAME \
               --location $LOCATION \
               --enable-rbac \
               --generate-ssh-keys
+
+# remove old config
+kubectl config delete-cluster timw-aks-cluster
+kubectl config delete-context timw-aks-cluster
+
+# add new config
+az aks get-credentials --resource-group timw-aks-rg --name timw-aks-cluster
