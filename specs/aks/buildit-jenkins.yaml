@@ -1,9 +1,3 @@
-# Secret created manually: https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets
-# e.g. kubectl create secret generic jenkins-startup-secret --from-literal=JENKINS_STARTUP_SECRET=<secret> -n buildit-jenkins
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: buildit-jenkins
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1

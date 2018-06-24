@@ -6,15 +6,15 @@
 # Get IP address of Ingress from:
 # kubectl get service -l app=nginx-ingress --namespace kube-system
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: ./set-fqdn.sh <IP ADDRESS> <DNS PREFIX>"
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ./set-fqdn.sh <IP ADDRESS>"
 fi
 
 # Public IP address
 IP=$1
 
 # Name to associate with public IP address
-DNSNAME=$2
+DNSNAME=timw-aks-ingress
 
 # Get the resource-id of the public ip
 PUBLICIPID=$(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv)
