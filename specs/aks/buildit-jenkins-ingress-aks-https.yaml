@@ -8,6 +8,7 @@ metadata:
   annotations:
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/add-base-url: "true"
 spec:
   tls:
   - hosts:

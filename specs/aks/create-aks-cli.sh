@@ -26,3 +26,6 @@ kubectl config delete-context timw-aks-cluster
 
 # add new config
 az aks get-credentials --resource-group timw-aks-rg --name timw-aks-cluster
+
+# Apply RBAC for dashboard
+kubectl apply -f dashboard-rbac.yaml
