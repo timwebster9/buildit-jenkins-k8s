@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: buildit-jenkins
+---
+# Then create secret:
+# kubectl create secret generic jenkins-startup-secret --from-literal=JENKINS_STARTUP_SECRET=<secret> -n buildit-jenkins

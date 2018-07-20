@@ -1,0 +1,147 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: buildit-jenkins
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["extensions"]
+  resources: ["deployments", "replicasets", "ingresses"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods", "pods/exec", "pods/log", "services"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: buildit-jenkins
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: buildit-jenkins
+roleRef:
+  kind: ClusterRole
+  name: buildit-jenkins 
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildit-jenkins-config
+  namespace: buildit-jenkins
+data:
+  JENKINS_CONFIG_FILE: https://github.com/timwebster9/jenkins-config-aks.git
+  JENKINS_STARTUP_SECRET_FILE: /var/run/jenkins/startup-secret/JENKINS_STARTUP_SECRET
+  JAVA_OPTS: >
+    -Djenkins.install.runSetupWizard=false
+    -Dhudson.slaves.NodeProvisioner.initialDelay=0
+    -Dhudson.slaves.NodeProvisioner.MARGIN=50
+    -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildit-jenkins
+  namespace: buildit-jenkins
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - image: builditdigital/jenkins-image:2.6.0-alpine
+        name: jenkins
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: startup-secret
+          mountPath: "/var/run/jenkins/startup-secret"
+          readOnly: true
+        env:
+        - name: JENKINS_STARTUP_SECRET_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JENKINS_STARTUP_SECRET_FILE
+        - name: JENKINS_CONFIG_FILE
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JENKINS_CONFIG_FILE
+        - name: JAVA_OPTS
+          valueFrom:
+            configMapKeyRef:
+              name: buildit-jenkins-config
+              key: JAVA_OPTS
+      volumes:
+      - name: startup-secret
+        secret:
+          secretName: jenkins-startup-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildit-encryptor
+  namespace: buildit-jenkins
+spec:
+  selector:
+    matchLabels:
+      app: encryptor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: encryptor
+    spec:
+      containers:
+      - image: builditdigital/encryptor-api:2.4.0
+        name: encryptor
+        ports:
+        - containerPort: 4567
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: encryptor-lb
+  namespace: buildit-jenkins
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 4567
+  selector:
+    app: encryptor
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-lb
+  namespace: buildit-jenkins
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: tcp
+    port: 5000
+    targetPort: 5000
+  selector:
+    app: jenkins
+
